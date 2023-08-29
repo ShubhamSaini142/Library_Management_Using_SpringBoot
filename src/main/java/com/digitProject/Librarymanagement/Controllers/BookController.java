@@ -40,16 +40,16 @@ public class BookController {
 
 	//Fetching Book through Id
 	@GetMapping("/{id}")
-	public ResponseEntity<String> getBook(@PathVariable Long id) {
+	public ResponseEntity<?> getBook(@PathVariable Long id) {
 		return bookService.getBookById(id);
 		
 	}
 
 	//Updating Book By Id
 	@PutMapping("/{id}")
-	public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @RequestBody BookDTO book) {
-	BookDTO updatedBook = bookService.updateBook(id, book);
-	return ResponseEntity.ok(updatedBook);
+	public ResponseEntity<?> updateBook(@PathVariable Long id, @RequestBody BookDTO book) {
+	ResponseEntity<?> updatedBook = bookService.updateBook(id, book);
+	return updatedBook;
 	}
 
 	

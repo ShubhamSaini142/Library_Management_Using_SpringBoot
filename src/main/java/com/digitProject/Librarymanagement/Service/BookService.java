@@ -48,80 +48,66 @@ public class BookService {
 	public List<BookDTO> findAll() {
 		List<Book> books = bookRepository.findAll();
 		return books.stream().map(this::mapToDTO).collect(Collectors.toList());
-		
-		}
 
-	
-	public ResponseEntity<String> getBookById(Long id) {
-//	Book book = bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Book not found"));
-//	return mapToDTO(book);
-//		if(bookRepository.existsById(id)) {
-//			bookRepository.findById(id);
-//			return "successfull retreived ";
-//		}
-//		else {
-//			return "book not exist";
-//		}
-		
-			Book book = bookRepository.findById(id).orElse(null);
-		if(book==null) {
-		
-			return new ResponseEntity<>("NOT FOUND",HttpStatus.NOT_FOUND);
+	}
+
+	public ResponseEntity<?> getBookById(Long id) {
+		Book book = bookRepository.findById(id).orElse(null);
+		if (book == null) {
+			return new ResponseEntity<>("NOT FOUND", HttpStatus.NOT_FOUND);
 		}
-		
-	 
-			return new ResponseEntity<String>("Book Availablr",HttpStatus.OK);
-			
-		
+		return new ResponseEntity<>(book, HttpStatus.OK);
 	}
 
 	public BookDTO saveBook(BookDTO bookDTO) {
-	Book book = mapToEntity(bookDTO);
-	book = bookRepository.save(book);
-	return mapToDTO(book);
-	}
-
-
-	public void deleteById(Long id) {
-	bookRepository.deleteById(id);
-	}
-
-	
-	public BookDTO borrowBook(Long bookId, Long userId) {
-	Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Book not found"));
-	User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-	if (book != null && !book.isBorrowed() && user != null) {
-	book.setBorrowedBy(user);
-	book.setBorrowed(true);
-	book = bookRepository.save(book);
-	return mapToDTO(book);
-	}
-	return null;
-	}
-
-	public BookDTO returnBook(Long bookId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Book not found"));
-		if (book != null && book.isBorrowed()) {
-		book.setBorrowedBy(null);
-		book.setBorrowed(false);
+		Book book = mapToEntity(bookDTO);
 		book = bookRepository.save(book);
 		return mapToDTO(book);
-		}
-		return null;
+	}
+
+	public void deleteById(Long id) {
+		bookRepository.deleteById(id);
+	}
+
+	public ResponseEntity<?> borrowBook(Long bookId, Long userId) {
+		Book book = bookRepository.findById(bookId).orElse(null);
+		User user = userRepository.findById(userId).orElse(null);
+		if (book != null && !book.isBorrowed() && user != null) {
+			book.setBorrowedBy(user);
+			book.setBorrowed(true);
+			book = bookRepository.save(book);
+//			return mapToDTO(book);
+			return new ResponseEntity<>(book, HttpStatus.OK);
+
+		} else {
+			return new ResponseEntity<>("Book Not Found", HttpStatus.NOT_FOUND);
+
 		}
 
-		public BookDTO updateBook(Long id, BookDTO updatedBookDTO) {
+	}
+
+	public ResponseEntity<?> returnBook(Long bookId) {
+		Book book = bookRepository.findById(bookId).orElse(null);
+		if (book != null && book.isBorrowed()) {
+			book.setBorrowedBy(null);
+			book.setBorrowed(false);
+			book = bookRepository.save(book);
+			return new ResponseEntity<>(book, HttpStatus.OK);
+		}
+		return new ResponseEntity<>("Book Not Found", HttpStatus.NOT_FOUND);
+	}
+
+	public ResponseEntity<?> updateBook(Long id, BookDTO updatedBookDTO) {
 		Optional<Book> optionalBook = bookRepository.findById(id);
 		if (optionalBook.isPresent()) {
-		Book existingBook = optionalBook.get();
-		existingBook.setTitle(updatedBookDTO.getTitle());
-		existingBook.setAuthor(updatedBookDTO.getAuthor());
-		bookRepository.save(existingBook);
-		return mapToDTO(existingBook);
+			Book existingBook = optionalBook.get();
+			existingBook.setTitle(updatedBookDTO.getTitle());
+			existingBook.setAuthor(updatedBookDTO.getAuthor());
+			bookRepository.save(existingBook);
+			return new ResponseEntity<>(existingBook, HttpStatus.OK);
 		} else {
-		throw new EntityNotFoundException("Book not found with ID: " + id);
+			return new ResponseEntity<>("BOOK NOT FOUND", HttpStatus.NOT_FOUND);
 		}
-		}
+	}
 
 }

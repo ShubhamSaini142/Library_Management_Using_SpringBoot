@@ -60,24 +60,17 @@ public class UserController {
     
     //User Borrowing Book
     @PostMapping("/{bookId}/borrow/{userId}")
-	public ResponseEntity<String> borrowBook(@PathVariable("bookId") Long bookId, @PathVariable("userId") Long userId) {
-		BookDTO borrowedBook = bookService.borrowBook(bookId, userId);
-		if (borrowedBook != null) {
-			return ResponseEntity.ok("Book Assined to User");
-		} else {
-			return ResponseEntity.badRequest().body("Book Already Assigned");
-		}
+	public ResponseEntity<?> borrowBook(@PathVariable("bookId") Long bookId, @PathVariable("userId") Long userId) {
+		ResponseEntity<?> borrowedBook = bookService.borrowBook(bookId, userId);
+		return borrowedBook;
+	
 	}
     
     //User returning the Book
 	@PostMapping("/{bookId}/return")
-	public ResponseEntity<String> returnBook(@PathVariable Long bookId) {
-		BookDTO returnedBook = bookService.returnBook(bookId);
-		if (returnedBook != null) {
-			return ResponseEntity.ok("SuccessFull Returned");
-		} else {
-			return ResponseEntity.badRequest().body("Something Went Wrong");
-		}
+	public ResponseEntity<?> returnBook(@PathVariable Long bookId) {
+		ResponseEntity<?> returnedBook = bookService.returnBook(bookId);
+		return returnedBook;
 	}
     
 }
